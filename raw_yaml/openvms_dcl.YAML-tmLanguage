@@ -1,0 +1,205 @@
+# [PackageDev] target_format: plist, ext: tmLanguage
+---
+name: DIGITAL Command Language (DCL)
+scopeName: source.dcl
+fileTypes: [com]
+uuid: 4981af1b-4082-48bb-ba55-412cff51de31
+
+patterns:
+#####################################
+#                                   #
+# BEGIN INVALID SYNTAX              #
+#                                   #
+#####################################
+
+- comment: Lines without a '$' - These are illegal, and should be displayed as errors
+  name: invalid.illegal.com
+  match: ^(?!\$)(.*)$                       # TODO: Don't allow for lines that don't begin with a $
+
+#####################################
+#                                   #
+# BEGIN LANGUAGE CONSTANTS          #
+#                                   #
+#####################################
+
+- comment: This rule denotes the various output streams of dcl
+  name: constant.language.com
+  match: (?i)(sys\$output|sys\$error|sys\$input|sys\$command|nl:)
+
+- comment: This rule denotes function returnrvalues of dcl
+  name: constant.language.com
+  match: (?i)(\$severity|\$status)
+
+- comment: This rule denotes the various signal handlers of dcl
+  name: constant.language.com
+  match: (?i)(control_y|control_c|sigabrt|sigalrm|sigbus|sigchild|sigemt|sigfpe|sighup|sigill|sigint|sigiot|sigkill|sigquit|sigpipe|sigsegv|sigsys|sigterm|sigtrap|sigusr1|sigusr2|sigwinch)
+
+- comment: A rule for boolean true and false in dcl
+  name: constant.language.com
+  match: (?i)(true|false)
+
+#####################################
+#                                   #
+# BEGIN COMMENTS                    #
+#                                   #
+#####################################
+
+- comment: Line comments in DCL - These start with $! and go up to a newline
+  name: comment.line.com
+  match: ^\$([ \t]*)\!(.*)
+
+#####################################
+#                                   #
+# BEGIN LINE START                  #
+#                                   #
+#####################################
+- comment: This is the marker that starts all DCL lines
+  name: constant.language.com
+  match: ^\$
+
+#####################################
+#                                   #
+# BEGIN STRINGS                     #
+#                                   #
+#####################################
+#TODO: - Maybe add a grammar rule for variables in strins 
+
+- comment: This is the grammar for simple double quoted strings ( for text )
+  name: string.quoted.double
+  match: \"([^\"]*)\"
+
+#####################################
+#                                   #
+# BEGIN NUMBERS                     #
+# TODO: Account for decimal points  #
+#                                   #
+#####################################
+- comment: These are the various octal numbers DCL recognizes
+  name: constant.language.com
+  match: ([-])?(%0[0-9]+)
+
+- comment: These are the various hexadecimal numbers DCL recognizes
+  name: constant.language.com
+  match: ([-])?(%((?i)X)[0-9]+)
+
+- comment: These are the various integer numbers DCL recognizes
+  name: constant.language.com
+  match: ([-])?([0-9]+)
+
+#####################################
+#                                   #
+# BEGIN COMPARISON OPERATORS        #
+#                                   #
+#####################################
+
+- comment: These are the substring replacement operators
+  name: keyword.operator.com
+  match: (:==|:=)
+
+- comment: These are the string comparison operators recognized by DCL
+  name: keyword.operator.com
+  match: \b(?i)(eqs|ges|gts|les|lts|nes|=)\b  # TODO: Make the regex recognize the '.' character
+
+- comment: These are the number comparison operators recognized by DCL
+  name: keyword.operator.com
+  match: \b(?i)(eq|ge|gt|le|lt|ne)\b
+
+#####################################
+#                                   #
+# BEGIN COMMAND SEPERATORS          #
+#                                   #
+#####################################
+
+- comment: These are seperators used by VMS's 'PIPE' command.
+  name: keyword.operator.com
+  match: (?i)(\|\||\||;|&&|&|@TEE)
+
+#####################################
+#                                   #
+# BEGIN CONTROL FLOW OPERATORS      #
+#                                   #
+#####################################
+
+- comment: These are the control flow mechanisms recognized by DCL
+  name: keyword.control.com
+  match: \b(?i)(if|else|then|endif|exit)\b
+
+#####################################
+#                                   #
+# BEGIN FUNCTION SYNTAX             #
+#                                   #
+#####################################
+
+- comment: This is the execute procedure grammar. (@function | @DEVICE)
+  name: entity.name.function.com
+  match: (?i)(@[^\s]*)
+
+- comment: These are DCL lexical functions that return infomration about character strings and attributes of current processes - If they are preceeded with a '/' then they are quantifiers
+  name: entity.name.function.com
+  match: \b(?i)(?<!\/)(f\$context|f\$csid|f\$cunits|f\$cvsi|f\$cvtime|f\$cvui|f\$delta_time|f\$device|f\$directory|f\$edit|f\$element|f\$environment|f\$extract|f\$fao|f\$fid_to_name|f\$file_attributes|f\$getdvi|f\$getenv|f\$getjpi|f\$getqui|f\$getsyi|f\$identifier|f\$integer|f\$length|f\$license|f\$locate|f\$match_wild|f\$message|f\$mode|f\$multipath|f\$parse|f\$pid|f\$privilege|f\$process|f\$search|f\$setprv|f\$string|f\$time|f\$trnlnm|f\$type|f\$unique|f\$user|f\$verify)\b # TODO: Long line is ugly...figure out how to split regex on multiple lines
+
+# TODO: Figure out gramar for login function
+- comment: These are built in recognized dcl functions - If they are preceeded with a '/' then they are quantifiers
+  name: entity.name.function.com
+  match: \b(?i)(?<!\/)(accounting|allocate|analyze/(audit|crash_dump|disk_structure|error_log/elv|error_log|image|media|object|process_dump|rms_file|system)|append|assign/(merge|queue)|assign|attach|backup|call|cancel|close|connect|continue|convert/(document|reclaim)|convert|copy/(ftp|rcp)|copy|create/(directory|fdl|name_table|terminal)|create|deallocate|deassign/queue|deassign|debug|deck|define/(characteristic|form|key)|define|deposit|diagnose|differences|directory|disable autostart|disconnect|dismount|dump|edit/(acl|edt|fdl|sum|teco|tpu)|enable autostart|endsubroutine|eod|eoj|examine|exchange/network|exchange|font|gosub|goto|help/message|help|initialize/queue|initialize|inquire|install|java|job|library|license|link|login|logout|macro|mail|merge|message|monitor|mount|ncs|on|open|password|patch|phone|pipe|pppd|print|product|purge|read|recall|rename|reply|request|return|run TODO|runoff|search|sort|spawn|submit|subroutine|synchronize|type|view|wait|write|xauth)\b
+
+- comment: These are built in recognized dcl DELETE functions
+  name: entity.name.function.com
+  match: \b(?i)(delete/(characteristic|entry|form|intrusion_record|key|queue/manager|queue|symbol)|delete)\b
+
+- comment: These are built ins recognized dcl SET functions
+  name: entity.name.function.com
+  match: \b(?i)(set (accounting|audit|broadcast|cache/reset|card_reader|cluster/expected_votes|command|control|cpu|day|default|device/served|device|directory|display|entry|file|host/(dte|dup|hsc|lat|rlogin|telnet|tn3270)|host|key|logins|magtape|message|network|on|output_rate|password|preferred_path|prefix|printer|process|prompt|protection/default|queue|restart_value|rights_list|rms_default|security|server|shadow|symbol|terminal|time|verify|volume|working_set)|set)\b
+
+- comment: These are build in recnized START functions
+  name: entity.name.function.com
+  match: \b(?i)(start/(cpu|network|queue/manager|queue|zone))\b 
+
+- comment: These are built in recognized dcl STOP functions
+  name: entity.name.function.com
+  match: \b(?i)(stop/(cpu|network|queue/(abort|entry|manager/cluster|next|requeue|reset)|queue|queues/on_node|zone)|stop)\b
+
+- comment: These are built in recognized dcl SHOW functions
+  name: entity.name.function.com
+  match: \b(?i)(show (accounting|audit|broadcast|cluster|cpu|default|devices/served|devices|display|entry|error|intrusion|key|license|logical|memory|network|printer|process|protection|queue/(characteristics|form|managers)|queue|quota|rms_default|security|server|shadow|status|symbol|system|terminal|time|translation|users|working_set|zone)|show)\b
+
+######################################
+#                                    #
+# BEGIN USER DEFINED FUNCTION SYNTAX #
+#                                    #
+######################################
+
+- comment: These are user defined functions invoked from the goto statement
+  name: support.function.com
+  match: \b(?i)(?<=goto[ ])([a-zA-Z0-9-_])+\b
+
+- comment: These are user defined functions invoked from the error quantifier
+  name: support.function.com
+  match: \b(?i)(?<=\/error=)([a-zA-Z0-9-_])+\b
+
+- comment: These are user defined functions invoked from the end_of_file quantifier
+  name:  support.function.com
+  match: \b(?i)(?<=\/end_of_file=)([a-zA-Z0-9-_])+\b
+
+- comment: These are the decleration of user defined function blocks. They appear on their own ine and end with a ':' and can not contain spaces
+  name: entity.name.function.com
+  match: ([a-zA-Z0-9-_]+)([^\s]*):$
+
+#################################################################################
+#                                                                               #
+# BEGIN VARIABLE SYNTAX                                                         #
+# Note: we place this block here since after the rest of the grammar is         #
+# parsed anything left should be a variable unless the user has made a mistake. #
+#                                                                               #
+# There are two kinds of variables: declarations variable_dec and invokations   #
+# 'variable_invoke'                                                             #
+#################################################################################
+
+- comment: This denotes a variable invokation.
+  name: variable.other.com
+  match: (?i)('([a-zA-Z0-9-_])+')
+
+- comment: This denotes a variable decleration. Note that symbol decleration is NOT considered a variable in DCL
+  name: variable.other.com
+  match: \b(?i)(?<!\/)(?<!goto[ ])([a-zA-Z0-9-_]+)\b
+...

@@ -1,0 +1,10 @@
+1- Proofread, and cleanup
+	Figure out how to split a regex on many lines so we don't have huge run on lines
+2- Stress test
+
+'Nice to haves - v2.0'
+1- See if I should account for variables in strings. 
+2- Some quantifiers actually have values that are functions. These can be figured out and probably should be
+	e.g.: read/error=a_function -> Note that the values assigned to '/error' is actually a function name
+3- Think of a way to style quantifiers to functionss
+4- Include the '.' character when parsing rules. Note sure if the YML syntax converter is broken
